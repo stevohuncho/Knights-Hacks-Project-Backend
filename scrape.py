@@ -27,6 +27,16 @@ def getRestaurantsData(lat, long):
         locationData['keywords'] = location.get('types', None)
         locationData['address'] = location.get('vicinity', None)
         locationData['id'] = location.get('reference', None)
+        locationData['icon'] = location.get('icon', None)
+        openingHours = location.get('opening_hours', None)
+        if openingHours :
+            locationData['open'] = openingHours.get('open_now', None)
+        geometry = location.get('geometry', None)
+        if geometry:
+            coords = geometry.get('location', None)
+            if coords:
+                locationData['lat'] = coords.get('lat', None)
+                locationData['long'] = coords.get('lng', None)
         restaurantsData[location['name']] = locationData
     return json.dumps(restaurantsData)
     

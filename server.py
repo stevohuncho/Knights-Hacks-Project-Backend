@@ -31,7 +31,7 @@ def nearme():
         return restaurantsData, 200
 
     # invalid response
-    return "error while finding restaurant data"
+    return "error while finding restaurant data", 400
 
 # get restaurant data in depth
 # example http://localhost:5001/restaurant?id=ChIJNX-91oxo54gRDzDmAJVGFRM
