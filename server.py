@@ -18,13 +18,20 @@ def nearme():
     # get latitude and longitude from query params
     latParams = request.args.getlist('lat')
     longParams = request.args.getlist('long')
+    minPriceParams = request.args.getlist('min')
+    maxPriceParams = request.args.getlist('max')
+    milesParams = request.args.getlist('miles')
 
     # check if params are valid
-    if len(latParams) != 1 or len(longParams) != 1:
+    if len(latParams) != 1 or len(longParams) != 1 or len(minPriceParams) != 1 or len(maxPriceParams) != 1 or len(milesParams) !=1:
         return "insufficient or excessive query params", 400
+    minPrice = int(minPriceParams[0])
+    maxPrice = int(maxPriceParams[0])
+    if maxPrice < minPrice or maxPrice < 0 or maxPrice > 4 or minPrice < 0 or minPrice > 4:
+        return "invalid price range", 400
 
     # get data
-    restaurantsData = getRestaurantsData(latParams[0], longParams[0])
+    restaurantsData = getRestaurantsData(latParams[0], longParams[0], minPriceParams[0], maxPriceParams[0], milesParams[0])
 
     # check if response is valid
     if restaurantsData:
