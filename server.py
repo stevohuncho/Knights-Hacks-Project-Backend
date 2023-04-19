@@ -1,8 +1,9 @@
+
 # import libraries
 from flask import Flask, request
 
 # import functions from scrape.py
-from scrape import getRestaurantsData, getRestaurantData
+from scrape import getRestaurantsData, getRestaurantData, getMoreRestaurantData
 
 server = Flask(__name__)
 
@@ -12,7 +13,6 @@ def hello():
     return "hello", 200
 
 # gets restaurants data near user
-# example http://localhost:5001/nearme?lat=28.5970378&long=-81.2276083
 @server.route("/nearme", methods=["GET"])
 def nearme():
     # get latitude and longitude from query params
@@ -40,8 +40,30 @@ def nearme():
     # invalid response
     return "error while finding restaurant data", 400
 
+# gets next page of restuarant data
+@server.route("/nextPage", methods=["GET"])
+def nextPage():
+    # get latitude and longitude from query params
+    latParams = request.args.getlist('lat')
+    longParams = request.args.getlist('long')
+    nextPageParams = request.args.getlist('token')
+
+
+    # check if params are valid
+    if len(latParams) != 1 or len(longParams) != 1 or len(nextPageParams) != 1:
+        return "insufficient or excessive query params", 400
+
+    # get data
+    restaurantsData = getMoreRestaurantData(latParams[0], longParams[0], nextPageParams[0])
+
+    # check if response is valid
+    if restaurantsData:
+        return restaurantsData, 200
+
+    # invalid response
+    return "error while finding restaurant data", 400
+
 # get restaurant data in depth
-# example http://localhost:5001/restaurant?id=ChIJNX-91oxo54gRDzDmAJVGFRM
 @server.route("/restaurant", methods=["GET"])
 def restaurant():
     # get id from query params

@@ -67,7 +67,7 @@ def getRestaurantData(id):
     print(response.json())
     return response.json()['result']
 
-def getMoreRestaurantData(NEXT_PAGE_TOKEN):
+def getMoreRestaurantData(lat, long, NEXT_PAGE_TOKEN):
     # send request
     url = f'https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken={NEXT_PAGE_TOKEN}&key={GOOGLE_API_KEY}'
     response = requests.get(url)
