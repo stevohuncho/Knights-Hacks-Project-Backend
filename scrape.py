@@ -66,4 +66,44 @@ def getRestaurantData(id):
     # parse response
     print(response.json())
     return response.json()['result']
+
+def getMoreRestaurantData(NEXT_PAGE_TOKEN):
+    # send request
+    url = f'https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken={NEXT_PAGE_TOKEN}&key={GOOGLE_API_KEY}'
+    response = requests.get(url)
+
+    # check for errors
+    if response.status_code != 200:
+        print(f'ERROR: nearby search request statuscode:{response.status_code}')
+        return 
+    if len(response.text) == 0:
+        print(f'ERROR: nearby search request statuscode:{response.status_code} empty body')
+        return
+    
+    # parse response
+    restaurantsData = {}
+    responseJson = response.json()
+    restaurantsData['next_page_token'] = responseJson.get('next_page_token', None)
+    for location in responseJson['results']:
+        locationData = {}
+        locationData['price_level'] = location.get('price_level', None)
+        locationData['rating'] = location.get('rating', None)
+        locationData['num_of_ratings'] = location.get('user_ratings_total', None)
+        locationData['keywords'] = location.get('types', None)
+        locationData['address'] = location.get('vicinity', None)
+        locationData['id'] = location.get('reference', None)
+        locationData['icon'] = location.get('icon', None)
+        openingHours = location.get('opening_hours', None)
+        if openingHours :
+            locationData['open'] = openingHours.get('open_now', None)
+        geometry = location.get('geometry', None)
+        if geometry:
+            coords = geometry.get('location', None)
+            if coords:
+                userCoords = (float(lat), float(long))
+                locationCoords = (float(coords.get('lat', None)), float(coords.get('lng', None)))
+                locationData['distance'] = round(float(geopy.distance.geodesic(userCoords, locationCoords).miles), 2)
+        restaurantsData[location['name']] = locationData
+    return json.dumps(restaurantsData)
+
     
